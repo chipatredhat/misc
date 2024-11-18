@@ -1,0 +1,100 @@
+#!/bin/sh
+
+# Set container to compare
+CONTAINER_NAME=
+
+# Set versions to compare
+# You can also use the sha digest by setting verion to latest@sha256:<sha_digest>
+CURRENT_VERSION=
+COMPARISON_VERSION=
+
+# Display usage if missing any variables, or if asked for
+function USAGE() { echo "Usage: $(basename $0) -c <CONTAINER_NAME> -r <CURRENT_VERSION> -p <COMPARISON_VERSION> [-o 'col|comp|csv'] " 1>&2; exit 1; }
+
+# Read the options pased
+while getopts ":c:r:p:o:" OPTIONS; do
+    case "${OPTIONS}" in
+        c)  # Container Name
+            CONTAINER_NAME=${OPTARG}
+            ;;
+
+        r)  # Current version
+            CURRENT_VERSION=${OPTARG}
+            ;;
+
+        p)  # Comparison version
+            COMPARISON_VERSION=${OPTARG}
+            ;;
+
+        o)  # Output one of either Columns, Comparison, or CSV
+            OUTPUT=${OPTARG}
+            ;;
+
+        *)
+            USAGE
+            ;;
+    esac
+done
+
+# Make sure variables are set
+if [ -z "${CONTAINER_NAME}" ] || [ -z "${CURRENT_VERSION}" ] || [ -z "${COMPARISON_VERSION}" ] ; then USAGE ; fi
+
+# Gather rpm info from ${CURRENT_VERSION}
+podman run --rm ${CONTAINER_NAME}:${CURRENT_VERSION} rpm -qa --qf "%{NAME} %{VERSION}-%{RELEASE}\n" | sort > full_${CURRENT_VERSION}_packages.txt
+awk '{print $1}' full_${CURRENT_VERSION}_packages.txt | sort > ${CURRENT_VERSION}_packages.txt
+
+# Gather rpm info from ${COMPARISON_VERSION}
+podman run --rm ${CONTAINER_NAME}:${COMPARISON_VERSION} rpm -qa --qf "%{NAME} %{VERSION}-%{RELEASE}\n" | sort > full_${COMPARISON_VERSION}_packages.txt
+awk '{print $1}' full_${COMPARISON_VERSION}_packages.txt | sort > ${COMPARISON_VERSION}_packages.txt
+
+# Show what is new in ${CURRENT_VERSION}
+for i in $(comm -23 ${CURRENT_VERSION}_packages.txt ${COMPARISON_VERSION}_packages.txt) ; do grep $i full_${CURRENT_VERSION}_packages.txt > only_in_${CURRENT_VERSION}.txt; done
+if [ ! -s "only_in_${CURRENT_VERSION}" ] ; then
+echo "The following rpm(s) have been added to ${CURRENT_VERSION}"
+cat only_in_${CURRENT_VERSION}.txt
+read -p "Press any key to continue: "
+fi
+
+# Show what has been removed from ${CURRENT_VERSION}
+for i in $(comm -13 ${CURRENT_VERSION}_packages.txt ${COMPARISON_VERSION}_packages.txt) ; do grep $i full_${COMPARISON_VERSION}_packages.txt > only_in_${COMPARISON_VERSION}.txt; done
+if [ ! -s "only_in_${COMPARISON_VERSION}_packages.txt" ] ; then
+echo "The following rpm(s) have been removed from ${CURRENT_VERSION}"
+cat only_in_${COMPARISON_VERSION}.txt
+read -p "Press any key to continue: "
+fi
+
+# Remove rpms that only exist in one version so we can compare version differences
+for i in $(awk '{print $1}' only_in_${CURRENT_VERSION}.txt); do grep -v $i full_${CURRENT_VERSION}_packages.txt | sed 's/\ /-/' | sort > just_${CURRENT_VERSION}_packages.txt ; done
+for i in $(awk '{print $1}' only_in_${COMPARISON_VERSION}.txt); do grep -v $i full_${COMPARISON_VERSION}_packages.txt | sed 's/\ /-/' | sort > just_${COMPARISON_VERSION}_packages.txt ; done
+
+# Now show the differences
+if [ "${OUTPUT}" = "comp" ] ; then
+# Display differences with > between versions
+diff -y --suppress-common-lines just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt | awk '{print $1,">",$3}'
+elif [ "${OUTPUT}" = "csv" ] ; then
+# Display differences with comma separated output
+diff -y --suppress-common-lines just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt | awk '{print $1","$3}'
+else
+# Display with default columns
+diff -y --suppress-common-lines just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt
+fi
+
+read -n 1 -p "Do you wish to save the results? (Y/N): " SAVEDATA ; echo ""
+if  [ "${SAVEDATA^^}" = "Y" ] ; then
+    read -p "Filename to save to: " SAVEFILE
+    echo -e "The following rpm(s) are only in ${CURRENT_VERSION}" > ${SAVEFILE}
+    cat only_in_${CURRENT_VERSION}.txt >> ${SAVEFILE}
+    echo -e "\nThe following rpm(s) are only in ${COMPARISON_VERSION}">> ${SAVEFILE}
+    cat only_in_${COMPARISON_VERSION}.txt >> ${SAVEFILE}
+    echo -e "\nThe changed versions are:">> ${SAVEFILE}
+    if [ "${OUTPUT}" = "comp" ] ; then
+         # Save differences with > between versions
+         diff -y --suppress-common-lines just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt | awk '{print $1,">",$3}' >> ${SAVEFILE}
+         elif [ "${OUTPUT}" = "csv" ] ; then
+         # Save differences with comma separated output
+         diff -y --suppress-common-lines just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt | awk '{print $1","$3}' >> ${SAVEFILE}
+         else
+         # Save with default columns
+         diff -y --suppress-common-lines just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt >> ${SAVEFILE}
+    fi
+fi
