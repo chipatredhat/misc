@@ -106,3 +106,6 @@ if  [ "${SAVEDATA^^}" = "Y" ] ; then
          diff -y --suppress-common-lines just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt >> ${SAVEFILE}
     fi
 fi
+
+# Cleanup after ourselves
+rm -f just_${COMPARISON_VERSION}_packages.txt just_${CURRENT_VERSION}_packages.txt full_${COMPARISON_VERSION}_packages.txt full_${COMPARISON_VERSION}_packages.txt only_in_${CURRENT_VERSION}.txt only_in_${COMPARISON_VERSION}.txt ${CURRENT_VERSION}_packages.txt ${COMPARISON_VERSION}_packages.txt
