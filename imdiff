@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# This scripts compares the rpm manifest from two different container images and reports the differences
+
+# Quick Start:
+# curl -sO https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/imdiff && chmod +x imdiff
+# ./imdiff
+
+# Variables can be set below or passed on the command line
+
 # Set container to compare
 CONTAINER_NAME=
 
