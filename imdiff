@@ -10,6 +10,7 @@
 
 # Set container to compare
 CONTAINER_NAME=
+CONTAINER_ALT_NAME=
 
 # Set versions to compare
 # You can also use the sha digest by setting verion to latest@sha256:<sha_digest>
@@ -17,13 +18,17 @@ CURRENT_VERSION=
 COMPARISON_VERSION=
 
 # Display usage if missing any variables, or if asked for
-function USAGE() { echo "Usage: $(basename $0) -c <CONTAINER_NAME> -r <CURRENT_VERSION> -p <COMPARISON_VERSION> [-o 'col|comp|csv'] " 1>&2; exit 1; }
+function USAGE() { echo "Usage: $(basename $0) -c <CONTAINER_NAME> [-a <CONTAINER_ALT_NAME>] -r <CURRENT_VERSION> -p <COMPARISON_VERSION> [-o 'col|comp|csv']" 1>&2; exit 1; }
 
 # Read the options pased
-while getopts ":c:r:p:o:" OPTIONS; do
+while getopts ":c:r:p:o:a:" OPTIONS; do
     case "${OPTIONS}" in
         c)  # Container Name
             CONTAINER_NAME=${OPTARG}
+            ;;
+
+        c)  # Alternate or Comparison Container Name
+            CONTAINER_ALT_NAME=${OPTARG}
             ;;
 
         r)  # Current version
@@ -44,6 +49,9 @@ while getopts ":c:r:p:o:" OPTIONS; do
     esac
 done
 
+# Use ${CONTAINER_NAME} for ${CONTAINER_ALT_NAME} if it isn't defined
+if [ -z "${CONTAINER_ALT_NAME}" ] ; then CONTAINER_ALT_NAME=${CONTAINER_NAME} ; fi
+
 # Make sure variables are set
 if [ -z "${CONTAINER_NAME}" ] || [ -z "${CURRENT_VERSION}" ] || [ -z "${COMPARISON_VERSION}" ] ; then USAGE ; fi
 
@@ -52,7 +60,7 @@ podman run --rm ${CONTAINER_NAME}:${CURRENT_VERSION} rpm -qa --qf "%{NAME} %{VER
 awk '{print $1}' full_${CURRENT_VERSION}_packages.txt | sort > ${CURRENT_VERSION}_packages.txt
 
 # Gather rpm info from ${COMPARISON_VERSION}
-podman run --rm ${CONTAINER_NAME}:${COMPARISON_VERSION} rpm -qa --qf "%{NAME} %{VERSION}-%{RELEASE}\n" | sort > full_${COMPARISON_VERSION}_packages.txt
+podman run --rm ${CONTAINER_ALT_NAME}:${COMPARISON_VERSION} rpm -qa --qf "%{NAME} %{VERSION}-%{RELEASE}\n" | sort > full_${COMPARISON_VERSION}_packages.txt
 awk '{print $1}' full_${COMPARISON_VERSION}_packages.txt | sort > ${COMPARISON_VERSION}_packages.txt
 
 # Show what is new in ${CURRENT_VERSION}
