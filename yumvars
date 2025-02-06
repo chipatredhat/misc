@@ -1,0 +1,33 @@
+# This script will get yum/dnf variables as referenced at:
+# https://docs.fedoraproject.org/en-US/fedora/f40/system-administrators-guide/package-management/DNF/#DNF.adoc#sec-Using_DNF_Variables
+# And leverages the solution found here:
+# https://unix.stackexchange.com/questions/19701/yum-how-can-i-view-variables-like-releasever-basearch-yum0
+
+# The output of yumvars can be used in other scripts or wherever needed
+# EXAMPLE: releasever=$(yumvars relesever) would define releasever as a useable variable
+
+
+if [ "${1}" = releasever ] ; then
+/usr/libexec/platform-python -c '
+import dnf, json
+db = dnf.dnf.Base()
+db.conf.substitutions.update_from_etc("/")
+print(json.dumps(db.conf.substitutions, indent=2))' | jq -r '.releasever'
+
+elif [ "${1}" = "basearch" ] ; then
+/usr/libexec/platform-python -c '
+import dnf, json
+db = dnf.dnf.Base()
+db.conf.substitutions.update_from_etc("/")
+print(json.dumps(db.conf.substitutions, indent=2))' | jq -r '.arch'
+
+elif [ "${1}" = "arch" ] ; then
+/usr/libexec/platform-python -c '
+import dnf, json
+db = dnf.dnf.Base()
+db.conf.substitutions.update_from_etc("/")
+print(json.dumps(db.conf.substitutions, indent=2))' | jq -r '.arch'
+
+else
+echo "usage: $0 [ arch | basearch | releasever ]"
+fi
