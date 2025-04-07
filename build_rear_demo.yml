@@ -1,0 +1,102 @@
+---
+# This playbook will setup a demo of the relax and recover (rear) utility.
+# It creates an nfs share on the same server that it will be backing up to
+# so it should NOT be used for actual backups.
+# There are no prequisites other than ansible core and
+# sufficient disk space (automatic partitioning on a 20GB disk is sufficient)
+#
+# To Use:
+# sudo dnf -y install ansible-core
+# curl https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/build_rear_demo.yml -O
+# ansible-playbook build_rear_demo.yml # NOTE: this runs local and user must have sudo privileges
+
+- hosts: localhost
+  connection: local
+  gather_facts: true
+
+  tasks:
+    - name: Install rear and nfs-utils
+      dnf:
+        name:
+          - rear
+          - nfs-utils
+        state: latest
+      become: true
+
+    - name: Check if site.conf exists
+      stat:
+        path: /etc/rear/site.conf
+      register: site_conf
+      become: true
+
+    - name: Exit with failure if site.conf already exists
+      fail:
+        msg: A site.conf file already exists.
+      when: site_conf.stat.exists
+
+    - name: Add nfs to /etc/hosts
+      lineinfile:
+        dest: /etc/hosts
+        line: "{{ ansible_default_ipv4.address }} nfs"
+      become: true
+
+    - name: Check if system is EFI
+      stat:
+        path: /sys/firmware/efi
+      register: efi_system
+
+    - name: Add UEFI_BOOTLOADER to /etc/rear/local.conf if system is EFI
+      lineinfile: 
+        dest: /etc/rear/local.conf
+        line: UEFI_BOOTLOADER=/boot/efi/EFI/redhat/grubx64.efi
+      when: efi_system.stat.exists
+      become: true
+
+    - name: Add SECURE_BOOT_BOOTLOADER to /etc/rear/local.conf if system is EFI
+      lineinfile: 
+        dest: /etc/rear/local.conf
+        line: SECURE_BOOT_BOOTLOADER=/boot/efi/EFI/redhat/shimx64.efi
+      when: efi_system.stat.exists
+      become: true
+
+    - name: Create site.conf if it doesn't exist
+      command: touch /etc/rear/site.conf
+      become: true
+      when: not site_conf.stat.exists
+
+    - name: Write site.conf configuration
+      blockinfile:
+        path: /etc/rear/site.conf
+        block: |
+          OUTPUT=ISO
+          OUTPUT_URL=nfs://nfs/home/rear
+          BACKUP=NETFS
+          BACKUP_URL=nfs://nfs/home/rear
+          BACKUP_PROG_EXCLUDE=( '/media' '/var/tmp' '/var/crash')
+      become: true
+
+    - name: Create nfs directory
+      file:
+        path: /home/rear
+        state: directory
+        mode: 0777
+      become: true
+
+    - name: Make sure /etc/exports exists
+      command: touch /etc/exports
+      become: true
+
+    - name: Add /home/rear export to /etc/exports
+      lineinfile:
+        path: /etc/exports
+        line: /home/rear *(rw)
+      become: true
+
+    - name: Start and enable nfs
+      systemd_service:
+        state: started
+        enabled: true
+        name: nfs-server
+      become: true
+
+# If firewall rules are added, the posix collection must be installed before they can be added
