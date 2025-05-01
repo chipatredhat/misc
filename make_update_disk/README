@@ -1,0 +1,23 @@
+DVD Created by <first name> <last name> <email@address> <date> # You can use 'date +%x' if you wish to script this
+
+This DVD contains all of the rpm updates to RHEL 8 since the final DVD release of 8.10 up to <date>
+
+In order to use this as a repo, a repofile needs to be created in /etc/yum.repos.d which can be done with the included script make_repo_file.sh
+To create your own repofile, see make_repo_file.sh for a reference
+
+=======================================================
+Following is a summary of how this DVD was made:
+=======================================================
+
+Download all of the updates since 1/1/24 on a RHEL 8 box that is subscribed to BaseOS:
+dnf download $(dnf repoquery --qf '%{buildtime} %{name}' | sort | grep -E '^2024|^2025' | awk '{print $3}'| sort -u | tr '\n' ' ')
+OPTIONAL:  Mount the build cd and compared the files, removing duplicates to reduce size.
+for i in $(ls <path_to_iso>/BaseOS/Packages/*.rpm) ; do ls <path_to_rpms> | grep -w $i >> /tmp/duplicates ; done
+for i in $(cat duplicates) ; do rm -f <path_to_rpms>/$i ; done
+AppStream contains no updates, so no need to compare those directories/repos
+
+Make the repo:
+createrepo <path_to_rpms>
+
+Make the iso:
+mkisofs -o <path_to_iso_name>.iso -joliet-long <path_to_rpms>
