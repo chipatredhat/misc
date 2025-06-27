@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script should only be used without modification to deploy the Image Mode Workshop from https://github.com/chipatredhat/ImageModeWorkshop in the Red Hat demo environment
-# You can execute this with: "curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh | bash -s --"
+# You can execute this with: "curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh | bash"
 
 API_TOKEN=$(cat ~/.secrets/.api_token)
 REGISTRY_TOKEN=$(cat ~/.secrets/.registry_token)
