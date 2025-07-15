@@ -6,5 +6,5 @@ echo 'type=83' | sudo sfdisk /dev/${DISK}
 sudo mkfs.xfs /dev/${DISK}1
 echo "/dev/${DISK}1 /var/lib/libvirt/images xfs defaults 0 0" | sudo tee -a /etc/fstab
 sudo systemctl daemon-reload
-mkdir -p /var/lib/libvirt/images
+sudo mkdir -p /var/lib/libvirt/images
 sudo mount -a
