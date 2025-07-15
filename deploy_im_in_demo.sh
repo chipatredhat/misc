@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script should only be used without modification to deploy the Image Mode Workshop from https://github.com/chipatredhat/ImageModeWorkshop in the Red Hat demo environment
-# You can execute this with: "curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh | bash"
+# You can execute this with: "curl -o https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh && bash ./deploy_im_in_demo.sh"
 
 [ "$2" = "" ] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
 
