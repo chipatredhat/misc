@@ -43,11 +43,11 @@ token=$(curl https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-
 [[ "${REGISTRY_ACCOUNT}" = "" ]] && echo "Your registry account is not available.  Please ensure it is stored at ~/.secrets/.registry_account. It may be created at https://access.redhat.com/terms-based-registry" && exit
 
 # This just makes the connection without asking to confirm the ssh key.  THIS IS INSECURE and should never be used outside of a transient demo environment such as this.
-ssh-copy-id -oStrictHostKeyChecking=no -p ${CNVPORT} ${CNVHOST}
+ssh-copy-id -oStrictHostKeyChecking=no -p ${CNVPORT} lab-user@${CNVHOST}
 
 # The demo environment has a blank disk that we use for the images we create:
-ssh -p ${CNVPORT} -t ${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/demo_make_disk.sh >/tmp/make_demo_disk.sh"
-ssh -p ${CNVPORT} -t ${CNVHOST} 'bash /tmp/make_demo_disk.sh'
+ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/demo_make_disk.sh >/tmp/make_demo_disk.sh"
+ssh -p ${CNVPORT} -t lab-user@${CNVHOST} 'bash /tmp/make_demo_disk.sh'
 
 # Now connect again, download and run the workshop using the varibles needed to build it out:
 ssh -p ${CNVPORT} -t ${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}' ; bash"
