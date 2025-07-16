@@ -12,9 +12,9 @@ if test ${GITVER} -gt ${VERSION} ; then
     sudo rm -f $0
     sudo curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh > $0
     sudo chmod +x $0
-    echo -e "\n\nThis script has been updated, please run it again to execute\n\n"
-    # exec bash "$0" "$@" # Have script restart after updating
-    exit
+    echo -e "\n\nThis script has been updated and is relaunching\n\n"
+    exec bash "$0" "$@" # Have script restart after updating
+    exit  # Just a failsafe in case the update goes awry
 fi
 
 [[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
