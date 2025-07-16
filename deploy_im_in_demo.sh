@@ -13,6 +13,7 @@ if test ${GITVER} -gt ${VERSION} ; then
     sudo curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh > $0
     sudo chmod +x $0
     echo -e "\n\nThis script has been updated, please run it again to execute\n\n"
+    # exec bash "$0" "$@" # Have script restart after updating
     exit
 fi
 
