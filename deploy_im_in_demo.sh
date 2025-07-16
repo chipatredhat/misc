@@ -7,14 +7,14 @@ VERSION=2025071601
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
 
 # Check if this is the latest version and update if not:
-GITVER=$(curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh | grep VERSION | cut -d = -f 2)
-if [ "${GITVER}" > "${VERSION}" ] ; then
-    sudo rm -f $0
-    sudo curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh > $0
-    sudo chmod +x $0
-    echo "This script has been updated, please run it again to execute"
-    exit
-fi
+#GITVER=$(curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh | grep VERSION | cut -d = -f 2)
+#if [ "${GITVER}" > "${VERSION}" ] ; then
+#    sudo rm -f $0
+#    sudo curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh > $0
+#    sudo chmod +x $0
+#    echo "This script has been updated, please run it again to execute"
+#    exit
+#fi
 
 [[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
 [[ -z $2 ]] && read -p "What port is used for ssh? " CNVPORT || CNVPORT=${2}
