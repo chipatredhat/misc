@@ -8,7 +8,7 @@ VERSION=2025071601
 
 # Check if this is the latest version and update if not:
 GITVER=$(curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh | grep VERSION | cut -d = -f 2)
-if [ "${GITVER}" -gt "${VERSION}" ] ; then
+if [ "${GITVER}" > "${VERSION}" ] ; then
     sudo rm -f $0
     sudo curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh > $0
     sudo chmod +x $0
