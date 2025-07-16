@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script should only be used without modification to deploy the Image Mode Workshop from https://github.com/chipatredhat/ImageModeWorkshop in the Red Hat demo environment
 # You can execute this with: "curl -sO https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh && bash ./deploy_im_in_demo.sh"
-VERSION=2025071601
+VERSION=2025071602
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -12,7 +12,7 @@ if test ${GITVER} -gt ${VERSION} ; then
     sudo rm -f $0
     sudo curl -s https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh > $0
     sudo chmod +x $0
-    echo "This script has been updated, please run it again to execute"
+    echo -e "\n\nThis script has been updated, please run it again to execute\n\n"
     exit
 fi
 
