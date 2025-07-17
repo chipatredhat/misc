@@ -5,7 +5,7 @@
 # Download this script to your preferred location with: "curl -sO https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh" make it executeable with chmod +x deploy_im_in_demo.sh
 # And run it to deploy the ImageModeWorkshop into the demo enironment
 
-VERSION=2025071701
+VERSION=2025071702
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -31,12 +31,13 @@ REGISTRY_ACCOUNT_FILE=${SECRETS_DIRECTORY}/.registry_account
 
 # Get the API Token if ${API_TOKEN_FILE} doesn't exist:
 if [ ! -f ${API_TOKEN_FILE} ] ; then
-    echo -e "Your API Token isn't stored in ${API_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/management/api"
+    echo -e "\n\nYour API Token isn't stored in ${API_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/management/api"
     read -p "What is your API Token? " API_TOKEN
     read -n1 -p "Would you like to save your API Token to ${API_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_API_TOKEN
     if [ "${SAVE_API_TOKEN^}" = "Y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${API_TOKEN} > ${API_TOKEN_FILE}
+        echo ""
     fi
 else
     API_TOKEN=$(cat ${API_TOKEN_FILE})
@@ -44,12 +45,13 @@ fi
 
 # Get the Registry Token if {REGISTRY_TOKEN_FILE} doesn't exist:
 if [ ! -f ${REGISTRY_TOKEN_FILE} ] ; then
-    echo "Your Registry Token isn't stored in ${REGISTRY_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
+    echo -e "\n\nYour Registry Token isn't stored in ${REGISTRY_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
     read -p "What is your Registry Token? " REGISTRY_TOKEN
     read -n1 -p "Would you like to save your Registry Token to ${REGISTRY_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_TOKEN
     if [ "${SAVE_REGISTRY_TOKEN^}" = "Y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${REGISTRY_TOKEN} > ${REGISTRY_TOKEN_FILE}
+        echo ""
     fi
 else
     REGISTRY_TOKEN=$(cat ${REGISTRY_TOKEN_FILE})
@@ -57,19 +59,20 @@ fi
 
 # Get the Registry Account Name if {REGISTRY_ACCOUNT_FILE} doesn't exist:
 if [ ! -f ${REGISTRY_ACCOUNT_FILE} ] ; then
-    echo "Your Registry Account file isn't stored in ${REGISTRY_ACCOUNT_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
+    echo -e "\n\nYour Registry Account file isn't stored in ${REGISTRY_ACCOUNT_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
     read -p "What is your Registry Account Name? " REGISTRY_ACCOUNT
     read -n1 -p "Would you like to save your Registry Account Name to ${REGISTRY_ACCOUNT_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_ACCOUNT
     if [ "${SAVE_REGISTRY_ACCOUNT^}" = "Y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${REGISTRY_ACCOUNT} > ${REGISTRY_ACCOUNT_FILE}
+        echo ""
     fi
 else
 REGISTRY_ACCOUNT=$(cat ${REGISTRY_ACCOUNT_FILE})
 fi
 
 # Verify the token is current:
-token=$(curl https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id=rhsm-api -d refresh_token=$API_TOKEN | jq --raw-output .access_token)
+token=$(curl -s https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id=rhsm-api -d refresh_token=$API_TOKEN | jq --raw-output .access_token)
 [[ "${token}" = "null" ]] && echo "Your token is not valid.  Please update your token at https://access.redhat.com/management/api and ensure it is stored in ~/.secrets/.api_token" && exit
 [[ "${REGISTRY_TOKEN}" = "" ]] && echo "Your registry token is not available.  Please ensure it is stored at ~/.secrets/.registry_token. It may be created at https://access.redhat.com/terms-based-registry" && exit
 [[ "${REGISTRY_ACCOUNT}" = "" ]] && echo "Your registry account is not available.  Please ensure it is stored at ~/.secrets/.registry_account. It may be created at https://access.redhat.com/terms-based-registry" && exit
