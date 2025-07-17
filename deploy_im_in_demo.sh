@@ -9,7 +9,7 @@
 # Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
 ### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025071703
+VERSION=2025071704
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -37,6 +37,7 @@ REGISTRY_ACCOUNT_FILE=${SECRETS_DIRECTORY}/.registry_account
 if [ ! -f ${API_TOKEN_FILE} ] ; then
     echo -e "\n\nYour API Token isn't stored in ${API_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/management/api"
     read -p "What is your API Token? " API_TOKEN
+    echo ""
     read -n1 -p "Would you like to save your API Token to ${API_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_API_TOKEN
     if [ "${SAVE_API_TOKEN^}" = "Y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
@@ -51,6 +52,7 @@ fi
 if [ ! -f ${REGISTRY_TOKEN_FILE} ] ; then
     echo -e "\n\nYour Registry Token isn't stored in ${REGISTRY_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
     read -p "What is your Registry Token? " REGISTRY_TOKEN
+    echo ""
     read -n1 -p "Would you like to save your Registry Token to ${REGISTRY_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_TOKEN
     if [ "${SAVE_REGISTRY_TOKEN^}" = "Y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
@@ -65,6 +67,7 @@ fi
 if [ ! -f ${REGISTRY_ACCOUNT_FILE} ] ; then
     echo -e "\n\nYour Registry Account file isn't stored in ${REGISTRY_ACCOUNT_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
     read -p "What is your Registry Account Name? " REGISTRY_ACCOUNT
+    echo ""
     read -n1 -p "Would you like to save your Registry Account Name to ${REGISTRY_ACCOUNT_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_ACCOUNT
     if [ "${SAVE_REGISTRY_ACCOUNT^}" = "Y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
