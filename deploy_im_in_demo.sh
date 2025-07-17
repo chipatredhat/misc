@@ -9,7 +9,7 @@
 # Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
 ### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025071705
+VERSION=2025071706
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -39,7 +39,7 @@ if [ ! -f ${API_TOKEN_FILE} ] ; then
     read -p "What is your API Token? " API_TOKEN
     echo ""
     read -n1 -p "Would you like to save your API Token to ${API_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_API_TOKEN
-    if [ "${SAVE_API_TOKEN^}" = "Y" ] ; then
+    if [ "${SAVE_API_TOKEN}" = "Y" ] || [ "${SAVE_API_TOKEN}" = "y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${API_TOKEN} > ${API_TOKEN_FILE}
         echo ""
@@ -54,7 +54,7 @@ if [ ! -f ${REGISTRY_TOKEN_FILE} ] ; then
     read -p "What is your Registry Token? " REGISTRY_TOKEN
     echo ""
     read -n1 -p "Would you like to save your Registry Token to ${REGISTRY_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_TOKEN
-    if [ "${SAVE_REGISTRY_TOKEN^}" = "Y" ] ; then
+    if [ "${SAVE_REGISTRY_TOKEN}" = "Y" ] || [ "${SAVE_REGISTRY_TOKEN}" = "y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${REGISTRY_TOKEN} > ${REGISTRY_TOKEN_FILE}
         echo ""
@@ -69,7 +69,7 @@ if [ ! -f ${REGISTRY_ACCOUNT_FILE} ] ; then
     read -p "What is your Registry Account Name? " REGISTRY_ACCOUNT
     echo ""
     read -n1 -p "Would you like to save your Registry Account Name to ${REGISTRY_ACCOUNT_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_ACCOUNT
-    if [ "${SAVE_REGISTRY_ACCOUNT^}" = "Y" ] ; then
+    if [ "${SAVE_REGISTRY_ACCOUNT}" = "Y" ] || [ "${SAVE_REGISTRY_ACCOUNT}" = "Y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${REGISTRY_ACCOUNT} > ${REGISTRY_ACCOUNT_FILE}
         echo ""
