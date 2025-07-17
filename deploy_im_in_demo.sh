@@ -17,30 +17,62 @@ if test ${GITVER} -gt ${VERSION} ; then
     exit  # Just a failsafe in case the update goes awry
 fi
 
-[[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
-[[ -z $2 ]] && read -p "What port is used for ssh? " CNVPORT || CNVPORT=${2}
+###### Check to see if the files to deploy exist and write them if not:
 
 # Location where you store your secrets for this script:
-API_TOKEN_FILE=~/.secrets/.api_token
-REGISTRY_TOKEN_FILE=~/.secrets/.registry_token
-REGISTRY_ACCOUNT_FILE=~/.secrets/.registry_account
+SECRETS_DIRECTORY=~/.secrets
+API_TOKEN_FILE=${SECRETS_DIRECTORY}/.api_token
+REGISTRY_TOKEN_FILE=${SECRETS_DIRECTORY}/.registry_token
+REGISTRY_ACCOUNT_FILE=${SECRETS_DIRECTORY}/.registry_account
 
-# Verify the secrets files defined above exist:
-[[ -f ${API_TOKEN_FILE} ]] || echo "Your api token file is not available.  Please ensure it is stored at ${API_TOKEN_FILE}. It may be created at https://access.redhat.com/management/api" || exit
-[[ -f ${REGISTRY_TOKEN_FILE} ]] && echo "Your registry token file is not available.  Please ensure it is stored at ${REGISTRY_TOKEN_FILE}. It may be created at https://access.redhat.com/terms-based-registry" || exit
-[[ -f ${REGISTRY_ACCOUNT_FILE} ]] && echo "Your registry account file is not available.  Please ensure it is stored at ${REGISTRY_ACCOUNT_FILE}. It may be created at https://access.redhat.com/terms-based-registry" || exit
+# Get the API Token if ${API_TOKEN_FILE} doesn't exist:
+if [ ! -f ${API_TOKEN_FILE} ] ; then
+    echo -e "Your API Token isn't stored in ${API_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/management/api"
+    read -p "What is your API Token? " API_TOKEN
+    read -n1 -p "Would you like to save your API Token to ${API_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_API_TOKEN
+    if [ "${SAVE_API_TOKEN^}" = "Y" ] ; then
+        [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
+        echo ${API_TOKEN} > ${API_TOKEN_FILE}
+    fi
+else
+    API_TOKEN=$(cat ${API_TOKEN_FILE})
+fi
 
-# Set the variables from the secrets files
-API_TOKEN=$(cat ${API_TOKEN_FILE})
-REGISTRY_TOKEN=$(cat ${REGISTRY_TOKEN_FILE})
+# Get the Registry Token if {REGISTRY_TOKEN_FILE} doesn't exist:
+if [ ! -f ${REGISTRY_TOKEN_FILE} ] ; then
+    echo "Your Registry Token isn't stored in ${REGISTRY_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
+    read -p "What is your Registry Token? " REGISTRY_TOKEN
+    read -n1 -p "Would you like to save your Registry Token to ${REGISTRY_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_TOKEN
+    if [ "${SAVE_REGISTRY_TOKEN^}" = "Y" ] ; then
+        [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
+        echo ${REGISTRY_TOKEN} > ${REGISTRY_TOKEN_FILE}
+    fi
+else
+    REGISTRY_TOKEN=$(cat ${REGISTRY_TOKEN_FILE})
+fi
+
+# Get the Registry Account Name if {REGISTRY_ACCOUNT_FILE} doesn't exist:
+if [ ! -f ${REGISTRY_ACCOUNT_FILE} ] ; then
+    echo "Your Registry Account file isn't stored in ${REGISTRY_ACCOUNT_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
+    read -p "What is your Registry Account Name? " REGISTRY_ACCOUNT
+    read -n1 -p "Would you like to save your Registry Account Name to ${REGISTRY_ACCOUNT_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_ACCOUNT
+    if [ "${SAVE_REGISTRY_ACCOUNT^}" = "Y" ] ; then
+        [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
+        echo ${REGISTRY_ACCOUNT} > ${REGISTRY_ACCOUNT_FILE}
+    fi
+else
 REGISTRY_ACCOUNT=$(cat ${REGISTRY_ACCOUNT_FILE})
-
+fi
 
 # Verify the token is current:
 token=$(curl https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id=rhsm-api -d refresh_token=$API_TOKEN | jq --raw-output .access_token)
 [[ "${token}" = "null" ]] && echo "Your token is not valid.  Please update your token at https://access.redhat.com/management/api and ensure it is stored in ~/.secrets/.api_token" && exit
 [[ "${REGISTRY_TOKEN}" = "" ]] && echo "Your registry token is not available.  Please ensure it is stored at ~/.secrets/.registry_token. It may be created at https://access.redhat.com/terms-based-registry" && exit
 [[ "${REGISTRY_ACCOUNT}" = "" ]] && echo "Your registry account is not available.  Please ensure it is stored at ~/.secrets/.registry_account. It may be created at https://access.redhat.com/terms-based-registry" && exit
+
+##### Start the deployment
+[[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
+[[ -z $2 ]] && read -p "What port is used for ssh? " CNVPORT || CNVPORT=${2}
 
 # This just makes the connection without asking to confirm the ssh key.  THIS IS INSECURE and should never be used outside of a transient demo environment such as this.
 ssh-copy-id -oStrictHostKeyChecking=no -p ${CNVPORT} lab-user@${CNVHOST}
