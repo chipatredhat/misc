@@ -1,11 +1,15 @@
 #!/bin/bash
 # This script should only be used without modification to deploy the Image Mode Workshop from https://github.com/chipatredhat/ImageModeWorkshop in the Red Hat demo environment utilizing a baremetal server from:
 # https://catalog.demo.redhat.com/catalog?search=baremetal
-# You can use the "small" deployment size
-# Download this script to your preferred location with: "curl -sO https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh" make it executeable with chmod +x deploy_im_in_demo.sh
-# And run it to deploy the ImageModeWorkshop into the demo enironment
+# ALL OTHER USES SHOULD MODIFY THIS SCRIPT AS NECESSARY
+# You can use the "small" deployment size for the demo
+# Once you have the deployment created you can build it out by:
+# Download this script to your preferred location and make it executeable with: 
+# curl -sO https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/deploy_im_in_demo.sh && chmod +x deploy_im_in_demo.sh
+# Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
+### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025071702
+VERSION=2025071703
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
