@@ -80,9 +80,10 @@ fi
 
 # Verify the token is current:
 token=$(curl -s https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id=rhsm-api -d refresh_token=$API_TOKEN | jq --raw-output .access_token)
-[[ "${token}" = "null" ]] && echo "Your token is not valid.  Please update your token at https://access.redhat.com/management/api and ensure it is stored in ~/.secrets/.api_token" && exit
-[[ "${REGISTRY_TOKEN}" = "" ]] && echo "Your registry token is not available.  Please ensure it is stored at ~/.secrets/.registry_token. It may be created at https://access.redhat.com/terms-based-registry" && exit
-[[ "${REGISTRY_ACCOUNT}" = "" ]] && echo "Your registry account is not available.  Please ensure it is stored at ~/.secrets/.registry_account. It may be created at https://access.redhat.com/terms-based-registry" && exit
+[[ "${token}" = "null" ]] && echo "Your API Token is not valid.  Please create an updated token at https://access.redhat.com/management/api"
+rm -f ${API_TOKEN_FILE} # Delete the token file since it's no longer valid
+read -p "Press any key to restart this script and enter a new API Token" -n1 -s
+exec bash "$0" "$@" # Have script restart after updating
 
 ##### Start the deployment
 [[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
