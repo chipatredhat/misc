@@ -37,12 +37,12 @@ REGISTRY_ACCOUNT_FILE=${SECRETS_DIRECTORY}/.registry_account
 if [ ! -f ${API_TOKEN_FILE} ] ; then
     echo -e "\n\nYour API Token isn't stored in ${API_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/management/api"
     read -p "What is your API Token? " API_TOKEN
-    echo ""
+    echo -e "\n"
     read -n1 -p "Would you like to save your API Token to ${API_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_API_TOKEN
     if [ "${SAVE_API_TOKEN}" = "Y" ] || [ "${SAVE_API_TOKEN}" = "y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${API_TOKEN} > ${API_TOKEN_FILE}
-        echo ""
+        echo -e "\n"
     fi
 else
     API_TOKEN=$(cat ${API_TOKEN_FILE})
@@ -52,12 +52,12 @@ fi
 if [ ! -f ${REGISTRY_TOKEN_FILE} ] ; then
     echo -e "\n\nYour Registry Token isn't stored in ${REGISTRY_TOKEN_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
     read -p "What is your Registry Token? " REGISTRY_TOKEN
-    echo ""
+    echo -e "\n"
     read -n1 -p "Would you like to save your Registry Token to ${REGISTRY_TOKEN_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_TOKEN
     if [ "${SAVE_REGISTRY_TOKEN}" = "Y" ] || [ "${SAVE_REGISTRY_TOKEN}" = "y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${REGISTRY_TOKEN} > ${REGISTRY_TOKEN_FILE}
-        echo ""
+        echo -e "\n"
     fi
 else
     REGISTRY_TOKEN=$(cat ${REGISTRY_TOKEN_FILE})
@@ -67,12 +67,12 @@ fi
 if [ ! -f ${REGISTRY_ACCOUNT_FILE} ] ; then
     echo -e "\n\nYour Registry Account file isn't stored in ${REGISTRY_ACCOUNT_FILE}.  If you do not currently have one, you can create one at https://access.redhat.com/terms-based-registry"
     read -p "What is your Registry Account Name? " REGISTRY_ACCOUNT
-    echo ""
+    echo -e "\n"
     read -n1 -p "Would you like to save your Registry Account Name to ${REGISTRY_ACCOUNT_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_ACCOUNT
     if [ "${SAVE_REGISTRY_ACCOUNT}" = "Y" ] || [ "${SAVE_REGISTRY_ACCOUNT}" = "y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${REGISTRY_ACCOUNT} > ${REGISTRY_ACCOUNT_FILE}
-        echo ""
+        echo -e "\n"
     fi
 else
 REGISTRY_ACCOUNT=$(cat ${REGISTRY_ACCOUNT_FILE})
