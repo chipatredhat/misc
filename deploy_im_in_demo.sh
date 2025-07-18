@@ -9,7 +9,7 @@
 # Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
 ### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025071706
+VERSION=2025071801
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -80,10 +80,12 @@ fi
 
 # Verify the token is current:
 token=$(curl -s https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id=rhsm-api -d refresh_token=$API_TOKEN | jq --raw-output .access_token)
-[[ "${token}" = "null" ]] && echo "Your API Token is not valid.  Please create an updated token at https://access.redhat.com/management/api"
-rm -f ${API_TOKEN_FILE} # Delete the token file since it's no longer valid
-read -p "Press any key to restart this script and enter a new API Token" -n1 -s
-exec bash "$0" "$@" # Have script restart after updating
+if [ "${token}" = "null" ] ; then
+    echo "Your API Token is not valid.  Please create an updated token at https://access.redhat.com/management/api"
+    rm -f ${API_TOKEN_FILE} # Delete the token file since it's no longer valid
+    read -p "Press any key to restart this script and enter a new API Token" -n1 -s
+    exec bash "$0" "$@" # Have script restart after updating
+fi
 
 ##### Start the deployment
 [[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
