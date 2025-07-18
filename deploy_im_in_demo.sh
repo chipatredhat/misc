@@ -69,7 +69,7 @@ if [ ! -f ${REGISTRY_ACCOUNT_FILE} ] ; then
     read -p "What is your Registry Account Name? " REGISTRY_ACCOUNT
     echo ""
     read -n1 -p "Would you like to save your Registry Account Name to ${REGISTRY_ACCOUNT_FILE} to allow deployments to automatically build? (Y/N) " SAVE_REGISTRY_ACCOUNT
-    if [ "${SAVE_REGISTRY_ACCOUNT}" = "Y" ] || [ "${SAVE_REGISTRY_ACCOUNT}" = "Y" ] ; then
+    if [ "${SAVE_REGISTRY_ACCOUNT}" = "Y" ] || [ "${SAVE_REGISTRY_ACCOUNT}" = "y" ] ; then
         [[ -d ${SECRETS_DIRECTORY} ]] || mkdir ${SECRETS_DIRECTORY}
         echo ${REGISTRY_ACCOUNT} > ${REGISTRY_ACCOUNT_FILE}
         echo ""
