@@ -87,6 +87,8 @@ if [ "${token}" = "null" ] ; then
     exec bash "$0" "$@" # Have script restart after updating
 fi
 
+# Ask if this should deploy the full pipeline:
+read -n1 -p "Do you wish to install the full pipeline? (Y/N) " INSTALL_PIPELINE
 ##### Start the deployment
 [[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
 [[ -z $2 ]] && read -p "What port is used for ssh? " CNVPORT || CNVPORT=${2}
@@ -99,4 +101,8 @@ ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} 'bash /tmp/make_demo_disk.sh'
 
 # Now connect again, download and run the workshop using the varibles needed to build it out:
+if  [ "${INSTALL_PIPELINE}" = "Y" ] || [ "${INSTALL_PIPELINE}" = "y" ] ; then
+ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}' ; /tmp/ImageModeWorkshop/files/add_workflow.sh ; bash"
+else
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}' ; bash"
+fi
