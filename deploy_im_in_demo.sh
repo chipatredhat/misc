@@ -9,7 +9,7 @@
 # Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
 ### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025072102
+VERSION=2025081101
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
