@@ -108,4 +108,5 @@ ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.
 else
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}'"
 fi
-echo "The installation is now complete.  You can connect vi ssh with ssh -p ${CNVPORT} -t lab-user@${CNVHOST} or access vi novnc at https://<ip_address>/vnc.html?host=<ip_address>&port=443"
+novnc_ip=$(ssh -q -p 30772 -t lab-user@ssh.ocpv04.rhdp.net "cat /home/lab-user/external_ip")
+echo "The installation is now complete.  You can connect vi ssh with ssh -p ${CNVPORT} -t lab-user@${CNVHOST} or access vi novnc at https://${novnc_ip}/vnc.html?host=${novnc_ip}&port=443"
