@@ -9,7 +9,7 @@
 # Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
 ### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025081101
+VERSION=2025081201
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -108,5 +108,5 @@ ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.
 else
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}'"
 fi
-novnc_ip=$(ssh -q -p 30772 -t lab-user@ssh.ocpv04.rhdp.net "cat /home/lab-user/external_ip")
+novnc_ip=$(ssh -q -p ${CNVPORT} -t lab-user@${CNVHOST} "cat /home/lab-user/external_ip")
 echo "The installation is now complete.  You can connect vi ssh with ssh -p ${CNVPORT} -t lab-user@${CNVHOST} or access vi novnc at https://${novnc_ip}/vnc.html?host=${novnc_ip}&port=443"
