@@ -9,7 +9,7 @@
 # Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
 ### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025081201
+VERSION=2025090401
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -91,6 +91,12 @@ fi
 read -n1 -p "Do you wish to install the full pipeline? (Y/N) " INSTALL_PIPELINE
 echo -e "\n"
 
+# If deploying the pipeline, should we prep the pre-work to show just the pipeline?
+if  [ "${INSTALL_PIPELINE}" = "Y" ] || [ "${INSTALL_PIPELINE}" = "y" ] ; then
+read -n1 -p "Do you wish to prep the environment to show just the pipeline? (Y/N) " JUST_PIPELINE
+echo -e "\n"
+fi
+
 ##### Start the deployment
 [[ -z $1 ]] && read -p "What is the hostname of the demo server.  EX: ssh.opcv00.rhdp.net? " CNVHOST || CNVHOST=${1}
 [[ -z $2 ]] && read -p "What port is used for ssh? " CNVPORT || CNVPORT=${2}
@@ -103,6 +109,10 @@ ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} 'bash /tmp/make_demo_disk.sh'
 
 # Now connect again, download and run the workshop using the varibles needed to build it out:
+if  [ "${JUST_PIPELINE}" = "Y" ] || [ "${JUST_PIPELINE}" = "y" ] ; then
+ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}' ; /tmp/ImageModeWorkshop/files/add_workflow.sh ; /tmp/prep_just_workflow.sh"
+fi
+
 if  [ "${INSTALL_PIPELINE}" = "Y" ] || [ "${INSTALL_PIPELINE}" = "y" ] ; then
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}' ; /tmp/ImageModeWorkshop/files/add_workflow.sh"
 else
