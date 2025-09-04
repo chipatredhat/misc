@@ -9,7 +9,7 @@
 # Now simply run this script to deploy the ImageModeWorkshop into the demo enironment with ./deploy_im_in_demo.sh
 ### NOTE:  This script will self update if there are updates, so once it is deployed, you shouldn't ever have to check for later versions, just run it
 
-VERSION=2025090401
+VERSION=2025090402
 
 # Display help if requested:
 [[ "${1}" = "-h" ]] || [[ "${1}" = "--help" ]] && printf "\n\nUsage: %s <username@hostname> <ssh_port> \nExample: $0 lab-user@ssh.ocpv999.demo.net 30124\n\n" "$0" && exit
@@ -111,12 +111,10 @@ ssh -p ${CNVPORT} -t lab-user@${CNVHOST} 'bash /tmp/make_demo_disk.sh'
 # Now connect again, download and run the workshop using the varibles needed to build it out:
 if  [ "${JUST_PIPELINE}" = "Y" ] || [ "${JUST_PIPELINE}" = "y" ] ; then
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}' ; /tmp/ImageModeWorkshop/files/add_workflow.sh ; /tmp/prep_just_workflow.sh"
-fi
-
-if  [ "${INSTALL_PIPELINE}" = "Y" ] || [ "${INSTALL_PIPELINE}" = "y" ] ; then
+elif  [ "${INSTALL_PIPELINE}" = "Y" ] || [ "${INSTALL_PIPELINE}" = "y" ] ; then
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}' ; /tmp/ImageModeWorkshop/files/add_workflow.sh"
 else
 ssh -p ${CNVPORT} -t lab-user@${CNVHOST} "curl -s https://raw.githubusercontent.com/chipatredhat/ImageModeWorkshop/refs/heads/main/prep.sh | bash -s -- '${API_TOKEN}' '${REGISTRY_ACCOUNT}' '${REGISTRY_TOKEN}'"
 fi
 novnc_ip=$(ssh -q -p ${CNVPORT} -t lab-user@${CNVHOST} "cat /home/lab-user/external_ip")
-echo "The installation is now complete.  You can connect vi ssh with ssh -p ${CNVPORT} -t lab-user@${CNVHOST} or access vi novnc at https://${novnc_ip}/vnc.html?host=${novnc_ip}&port=443"
+echo -e "\n\nThe installation is now complete.\nYou can connect vi ssh with: ssh -p ${CNVPORT} -t lab-user@${CNVHOST}\nor access vi novnc at: https://${novnc_ip}/vnc.html?host=${novnc_ip}&port=443\n\n"
