@@ -1,3 +1,15 @@
+# This container will retrieve a letsencrypt certificate using API credentials from cloudflare
 FROM registry.access.redhat.com/ubi9/ubi:latest
 RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 RUN dnf -y install certbot python3-certbot python3-certbot-dns-cloudflare
+
+# Set this up how you like.  Here is an example:
+# DOMAIN=     # Set this to the domain you are getting a certificate for.  EX: example.com
+# API_TOKEN=     # Set this to the token you created following instructions at https://developers.cloudflare.com/fundamentals/api/get-started/create-token/
+# CERTIFICATE=     # Set this to the certificate you are creating.  This can be an individual host such as server1.example.com or a wildcard such as *.example.com
+# EMAIL_ADDRESS=     # The email address to link this certificate to for letsencrypt
+# mkdir -p ~/letsencrypt/credentials
+# echo "dns_cloudflare_api_token = ${API_TOKEN}" > ~/letsencrypt/credentials/${DOMAIN}
+# chmod 600 ~/letsencrypt/credentials/${DOMAIN}
+# podman run -it --rm -v ~/letsencrypt:/etc/letsencrypt:z localhost/certbot_cloudflare:latest certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/credentials/${DOMAIN} --dns-cloudflare-propagation-seconds 30 -d ${CERTIFICATE} --email ${EMAIL_ADDRESS} --agree-tos --no-eff-email --dry-run --staging
+# Remove --dry-run --staging after confirming everything works to issue a certificate which will be stored in ~/letsencrypt/live/${DOMAIN}
