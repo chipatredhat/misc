@@ -1,4 +1,6 @@
 # This container will retrieve a letsencrypt certificate using API credentials from cloudflare
+# Build and tag with:
+# podman build https://raw.githubusercontent.com/chipatredhat/misc/refs/heads/main/letsencrypt-cloudflare --tag localhost/certbot_cloudflare
 FROM registry.access.redhat.com/ubi9/ubi:latest
 RUN dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
 RUN dnf -y install certbot python3-certbot python3-certbot-dns-cloudflare
