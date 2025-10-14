@@ -13,3 +13,7 @@ RUN dnf -y install certbot python3-certbot python3-certbot-dns-cloudflare
 # chmod 600 ~/letsencrypt/credentials/${DOMAIN}
 # podman run -it --rm -v ~/letsencrypt:/etc/letsencrypt:z localhost/certbot_cloudflare:latest certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/credentials/${DOMAIN} --dns-cloudflare-propagation-seconds 30 -d ${CERTIFICATE} --email ${EMAIL_ADDRESS} --agree-tos --no-eff-email --dry-run --staging
 # Remove --dry-run --staging after confirming everything works to issue a certificate which will be stored in ~/letsencrypt/live/${DOMAIN}
+#
+# Subsequent renewals can be run by simply running the container:
+# podman run -it --rm -v ~/letsencrypt:/etc/letsencrypt:z localhost/certbot_cloudflare:latest certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/credentials/${DOMAIN} --dns-cloudflare-propagation-seconds 30 -d ${CERTIFICATE} --email ${EMAIL_ADDRESS} --agree-tos --no-eff-email
+# I would suggest replacing the variables with the actual values and adding it to cron to automatically renew when necessary
